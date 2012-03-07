@@ -3,6 +3,7 @@ from django import http
 from django.utils.translation import check_for_language
 from localeurl import utils
 from localeurl import settings as localeurl_settings
+from localeurl import signals
 
 def change_locale(request):
     """
@@ -24,6 +25,8 @@ def change_locale(request):
             if localeurl_settings.USE_SESSION:
                 request.session['django_language'] = locale
             path = utils.locale_path(path, locale)
+            signals.locale_change.send(sender=change_locale, locale=locale,
+                user=request.user)
 
     response = http.HttpResponseRedirect(path)
     return response
